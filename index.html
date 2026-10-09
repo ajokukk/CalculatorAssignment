@@ -3,564 +3,167 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Calculator + GPA</title>
+<meta name="description" content="UAES Calculator: a mobile-friendly calculator with GPA and CGPA tools for students.">
+<meta name="theme-color" content="#f6a93a">
+<title>UAES Calculator</title>
+<link rel="icon" href="assets/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --ink: #1d1b2e;
-    --body: #f6a93a;        /* orange shell */
-    --body-dark: #e18f1f;
-    --edge: #6b7fd1;        /* blue-purple thickness */
-    --edge-dark: #4c5fb0;
-    --screen: #93d2ea;      /* light blue screen */
-    --key: #8fd0ea;
-    --key-edge: #5873c4;
-    --brown: #b5533c;
-    --brown-edge: #7d3424;
-    --red: #ef4a2f;
-    --red-edge: #a8281a;
-    --bw: 4px;
-  }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; min-height: 100%; }
-  body {
-    font-family: "Patrick Hand", "Baloo 2", system-ui, sans-serif;
-    background: #fff4d6;
-    background-image: radial-gradient(#f3dca0 2px, transparent 2px);
-    background-size: 22px 22px;
-    color: var(--ink); padding: 18px 16px 34px; display: flex; justify-content: center;
-  }
-  .wrap { width: 100%; max-width: 440px; }
-
-  /* tabs */
-  .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
-  .tab {
-    flex: 1; padding: 11px 8px; border: var(--bw) solid var(--ink); border-radius: 16px; cursor: pointer;
-    background: var(--key); color: var(--ink); font: 800 17px "Baloo 2", sans-serif;
-    box-shadow: 0 5px 0 var(--key-edge); transition: transform .06s, box-shadow .06s;
-  }
-  .tab.active { background: var(--body); box-shadow: 0 5px 0 var(--body-dark); }
-  .tab:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--key-edge); }
-
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* calculator shell: orange face + blue thickness */
-  .shell {
-    background: var(--body); border: var(--bw) solid var(--ink); border-radius: 26px;
-    padding: 18px 16px 22px;
-    box-shadow: 10px 10px 0 -1px var(--edge), 10px 10px 0 2px var(--ink);
-    margin-right: 10px; margin-bottom: 10px;
-  }
-
-  .screen {
-    background: var(--screen); border: var(--bw) solid var(--ink); border-radius: 16px;
-    padding: 8px 14px 10px; text-align: right; box-shadow: inset 0 4px 0 rgba(255,255,255,.35);
-  }
-  .history { height: 58px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; justify-content: flex-end; }
-  .history::-webkit-scrollbar { display: none; }
-  .history div { font-size: 16px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; opacity: .65; }
-  .history div:hover { opacity: 1; }
-  .preview { font-size: 20px; min-height: 24px; opacity: .7; }
-  .expr { font: 800 clamp(34px, 11vw, 50px) "Baloo 2", sans-serif; line-height: 1.1; min-height: 1.1em; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
-  .expr::-webkit-scrollbar { display: none; }
-
-  /* little round brown buttons + red squares, like the drawing */
-  .top { display: flex; justify-content: space-between; align-items: center; margin: 18px 4px 6px; gap: 10px; }
-  .rounds { display: flex; gap: 12px; }
-  .round {
-    width: clamp(40px, 11vw, 48px); height: clamp(40px, 11vw, 48px); border-radius: 50%;
-    border: 3px solid var(--ink); background: var(--brown); color: #fff; cursor: pointer;
-    font: 800 15px "Baloo 2", sans-serif; box-shadow: 0 5px 0 var(--brown-edge);
-    transition: transform .06s, box-shadow .06s;
-  }
-  .round:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--brown-edge); }
-  .squares { display: flex; gap: 6px; }
-  .sq {
-    width: clamp(32px, 9vw, 40px); height: clamp(30px, 8vw, 36px); border: 3px solid var(--ink);
-    background: var(--red); color: #fff; cursor: pointer; font: 800 clamp(15px, 4vw, 19px) "Baloo 2", sans-serif;
-    border-radius: 5px; box-shadow: 0 4px 0 var(--red-edge); padding: 0; transition: transform .06s, box-shadow .06s;
-  }
-  .sq:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--red-edge); }
-  .sq.gap { margin-left: 6px; }
-
-  .keys { margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(56px, 16vw, 70px); gap: 12px 10px; }
-  .key {
-    background: var(--key); border: 3px solid var(--ink); border-radius: 14px; cursor: pointer; color: var(--ink);
-    font: 800 clamp(22px, 7vw, 30px) "Baloo 2", sans-serif;
-    box-shadow: 0 7px 0 var(--key-edge), 0 7px 0 3px var(--ink); margin-bottom: 7px;
-    transition: transform .06s, box-shadow .06s;
-  }
-  .key:active { transform: translateY(6px); box-shadow: 0 1px 0 var(--key-edge), 0 1px 0 3px var(--ink); }
-
-  /* ---------- GPA ---------- */
-  .gpa .head { display: inline-block; background: var(--screen); border: 3px solid var(--ink); border-radius: 12px; padding: 2px 12px; font: 800 19px "Baloo 2", sans-serif; margin: 0 0 12px; }
-  .small { font: 700 13px "Patrick Hand", sans-serif; text-transform: uppercase; letter-spacing: .04em; }
-  .field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
-  .row { display: flex; gap: 10px; margin-bottom: 10px; }
-  input, select {
-    width: 100%; height: 46px; border: 3px solid var(--ink); border-radius: 12px; background: #fff;
-    color: var(--ink); padding: 0 10px; font: 700 17px "Patrick Hand", sans-serif; /* ≥16px stops iOS zoom */
-  }
-  input:focus, select:focus { outline: 0; background: var(--screen); box-shadow: 0 4px 0 var(--key-edge); }
-  .course { display: grid; grid-template-columns: 1.5fr .8fr .95fr 46px; gap: 8px; margin-bottom: 8px; }
-  .del { height: 46px; border: 3px solid var(--ink); border-radius: 12px; background: var(--red); color: #fff; font: 800 22px "Baloo 2", sans-serif; cursor: pointer; box-shadow: 0 4px 0 var(--red-edge); padding: 0; }
-  .del:active { transform: translateY(3px); box-shadow: none; }
-  .btn { border: 3px solid var(--ink); border-radius: 14px; padding: 10px 16px; font: 800 16px "Baloo 2", sans-serif; cursor: pointer; background: var(--key); color: var(--ink); box-shadow: 0 5px 0 var(--key-edge); }
-  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--key-edge); }
-  .btn.alt { background: #fff; }
-  .btn.brown { background: var(--brown); color: #fff; box-shadow: 0 5px 0 var(--brown-edge); }
-  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 8px; }
-  hr { border: 0; border-top: 3px dashed var(--ink); margin: 18px 0; }
-  .hint { font-size: 16px; margin: 0 0 8px; }
-
-  .results { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
-  .card { border: 3px solid var(--ink); border-radius: 16px; padding: 10px 12px; background: var(--screen); box-shadow: 0 5px 0 var(--key-edge); }
-  .card.b { background: #fff; box-shadow: 0 5px 0 var(--body-dark); }
-  .card .val { font: 800 clamp(32px, 10vw, 42px) "Baloo 2", sans-serif; line-height: 1.1; }
-  .card.wide { grid-column: 1 / -1; background: #fff; box-shadow: 0 5px 0 var(--edge); }
-  .cls { font: 800 19px "Baloo 2", sans-serif; }
-  .vibe { margin-top: 8px; font-size: 17px; background: var(--ink); color: #ffe9a8; padding: 8px 10px; border-radius: 10px; }
-
-  .bar { position: relative; height: 24px; border: 3px solid var(--ink); border-radius: 12px; background: #fff; margin: 8px 0 3px; overflow: visible; }
-  .bar .fill { height: 100%; border-radius: 8px; background: var(--red); width: 0; transition: width .4s ease; }
-  .bar .tick { position: absolute; top: -5px; bottom: -5px; width: 3px; background: var(--ink); }
-  .barlbl { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; }
-
-  .planner-out { margin-top: 10px; border: 3px dashed var(--ink); border-radius: 14px; padding: 10px 12px; font-size: 18px; min-height: 52px; background: #fff7e0; }
-  .planner-out.ok { background: #c9f2a7; border-style: solid; }
-  .planner-out.bad { background: #ffb4a8; border-style: solid; }
-
-  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #ffe9a8; padding: 10px 18px; border-radius: 14px; font: 700 16px "Patrick Hand", sans-serif; display: none; z-index: 9; max-width: 90vw; }
-
-  @media (max-width: 380px) {
-    body { padding: 10px 10px 28px; }
-    .shell { padding: 14px 12px 18px; border-radius: 22px; }
-    .course { grid-template-columns: 1.3fr .8fr .9fr 42px; gap: 6px; }
-    .keys { gap: 10px 8px; }
-  }
-  @media (min-width: 700px) { body { padding-top: 40px; } }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <div class="tabs" role="tablist">
-    <button class="tab active" id="tabCalc" role="tab" aria-selected="true">Calculator</button>
-    <button class="tab" id="tabGpa" role="tab" aria-selected="false">GPA / CGPA</button>
+
+<!-- Everything lives inside .uaes-app so it can be merged into another page. -->
+<div class="uaes-app is-page">
+  <div class="wrap">
+
+    <header class="brand">
+      <div class="logo-badge">
+        <img src="assets/logo.png" alt="UAES logo" id="logoImg">
+        <!-- Generic fallback emblem (shown only if assets/logo.png is missing) -->
+        <svg id="logoFallback" viewBox="0 0 100 100" role="img" aria-label="UAES" hidden>
+          <circle cx="50" cy="50" r="46" fill="#1f8a3b" stroke="#1d1b2e" stroke-width="4"/>
+          <path d="M18 42 L50 27 L82 42 L50 57 Z" fill="#fff" stroke="#1d1b2e" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M33 50 V65 Q50 76 67 65 V50" fill="#ffe9a8" stroke="#1d1b2e" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M82 42 V62" stroke="#1d1b2e" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>UAES CALCULATOR</h1>
+        <p>Calculator + GPA / CGPA</p>
+      </div>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" id="tabCalc" role="tab" aria-selected="true">Calculator</button>
+      <button class="tab" id="tabGpa" role="tab" aria-selected="false">GPA / CGPA</button>
+    </div>
+
+    <!-- CALCULATOR -->
+    <section class="panel active" id="panelCalc">
+      <div class="shell calc">
+        <div class="screen">
+          <div class="history" id="history" aria-label="History"></div>
+          <div class="preview" id="preview"></div>
+          <div class="expr" id="expr" aria-live="polite">0</div>
+        </div>
+
+        <div class="top">
+          <div class="rounds">
+            <button class="round" data-act="clear" aria-label="Clear">CE</button>
+            <button class="round" data-act="back" aria-label="Backspace">⌫</button>
+            <button class="round" data-act="ans" aria-label="Last answer">Ans</button>
+          </div>
+          <div class="squares">
+            <button class="sq" data-v="(" aria-label="Open bracket">(</button>
+            <button class="sq" data-v=")" aria-label="Close bracket">)</button>
+            <button class="sq" data-v="%" aria-label="Percent">%</button>
+            <button class="sq gap" data-act="gpa" aria-label="Go to GPA calculator">GPA</button>
+          </div>
+        </div>
+
+        <div class="keys">
+          <button class="key" data-v="7">7</button>
+          <button class="key" data-v="8">8</button>
+          <button class="key" data-v="9">9</button>
+          <button class="key" data-v="÷">÷</button>
+
+          <button class="key" data-v="4">4</button>
+          <button class="key" data-v="5">5</button>
+          <button class="key" data-v="6">6</button>
+          <button class="key" data-v="×">×</button>
+
+          <button class="key" data-v="1">1</button>
+          <button class="key" data-v="2">2</button>
+          <button class="key" data-v="3">3</button>
+          <button class="key" data-v="−">−</button>
+
+          <button class="key" data-v="0">0</button>
+          <button class="key" data-v=".">.</button>
+          <button class="key" data-act="equals">=</button>
+          <button class="key" data-v="+">+</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GPA -->
+    <section class="panel" id="panelGpa">
+      <div class="shell gpa">
+        <div class="head">Grade check</div>
+
+        <div class="row">
+          <div class="field">
+            <label class="small" for="scale">Grading scale</label>
+            <select id="scale">
+              <option value="5">5.0 scale (A=5)</option>
+              <option value="4">4.0 scale (A=4)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="course" style="margin-bottom:2px">
+          <span class="small">Course</span><span class="small">Units</span><span class="small">Grade</span><span></span>
+        </div>
+        <div id="courses"></div>
+
+        <div class="actions">
+          <button class="btn" id="addCourse">+ Course</button>
+          <button class="btn alt" id="resetGpa">Reset</button>
+        </div>
+
+        <hr>
+        <p class="hint"><b>For CGPA</b>, add your record from earlier semesters (optional):</p>
+        <div class="row">
+          <div class="field">
+            <label class="small" for="prevCgpa">Previous CGPA</label>
+            <input id="prevCgpa" type="number" inputmode="decimal" step="0.01" min="0" placeholder="4.12">
+          </div>
+          <div class="field">
+            <label class="small" for="prevUnits">Previous units</label>
+            <input id="prevUnits" type="number" inputmode="numeric" step="1" min="0" placeholder="60">
+          </div>
+        </div>
+
+        <div class="results">
+          <div class="card"><div class="small">Semester GPA</div><div class="val" id="gpaVal">0.00</div></div>
+          <div class="card b"><div class="small">CGPA</div><div class="val" id="cgpaVal">0.00</div></div>
+          <div class="card wide">
+            <div class="small" id="unitsLbl">Total units</div>
+            <div class="cls" id="clsVal">—</div>
+            <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
+            <div class="barlbl"><span>0</span><span id="barMax">5.0</span></div>
+            <div class="vibe" id="vibe">Add your courses to see your damage.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn brown" id="copyBtn">Copy result</button>
+        </div>
+
+        <hr>
+        <div class="head">Target planner</div>
+        <p class="hint">What do you need next semester to land your dream CGPA?</p>
+        <div class="row">
+          <div class="field">
+            <label class="small" for="target">Target CGPA</label>
+            <input id="target" type="number" inputmode="decimal" step="0.01" min="0" placeholder="4.50">
+          </div>
+          <div class="field">
+            <label class="small" for="remUnits">Units to go</label>
+            <input id="remUnits" type="number" inputmode="numeric" step="1" min="1" placeholder="24">
+          </div>
+        </div>
+        <div class="planner-out" id="plannerOut">Fill both boxes. Do the math, skip the panic.</div>
+      </div>
+    </section>
+
+    <p class="foot">Unofficial student tool. Always confirm your results with your department.</p>
   </div>
 
-  <!-- CALCULATOR -->
-  <section class="panel active" id="panelCalc">
-    <div class="shell calc">
-      <div class="screen">
-        <div class="history" id="history" aria-label="History"></div>
-        <div class="preview" id="preview"></div>
-        <div class="expr" id="expr" aria-live="polite">0</div>
-      </div>
-
-      <div class="top">
-        <div class="rounds">
-          <button class="round" data-act="clear" aria-label="Clear">CE</button>
-          <button class="round" data-act="back" aria-label="Backspace">⌫</button>
-          <button class="round" data-act="ans" aria-label="Last answer">Ans</button>
-        </div>
-        <div class="squares">
-          <button class="sq" data-v="(" aria-label="Open bracket">(</button>
-          <button class="sq" data-v=")" aria-label="Close bracket">)</button>
-          <button class="sq" data-v="%" aria-label="Percent">%</button>
-          <button class="sq gap" data-act="gpa" aria-label="Go to GPA calculator" style="font-size:12px">GPA</button>
-        </div>
-      </div>
-
-      <div class="keys">
-        <button class="key" data-v="7">7</button>
-        <button class="key" data-v="8">8</button>
-        <button class="key" data-v="9">9</button>
-        <button class="key" data-v="÷">÷</button>
-
-        <button class="key" data-v="4">4</button>
-        <button class="key" data-v="5">5</button>
-        <button class="key" data-v="6">6</button>
-        <button class="key" data-v="×">×</button>
-
-        <button class="key" data-v="1">1</button>
-        <button class="key" data-v="2">2</button>
-        <button class="key" data-v="3">3</button>
-        <button class="key" data-v="−">−</button>
-
-        <button class="key" data-v="0">0</button>
-        <button class="key" data-v=".">.</button>
-        <button class="key" data-act="equals">=</button>
-        <button class="key" data-v="+">+</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- GPA -->
-  <section class="panel" id="panelGpa">
-    <div class="shell gpa">
-      <div class="head">Grade check</div>
-
-      <div class="row">
-        <div class="field">
-          <label class="small" for="scale">Grading scale</label>
-          <select id="scale">
-            <option value="5">5.0 scale (A=5)</option>
-            <option value="4">4.0 scale (A=4)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="course" style="margin-bottom:2px">
-        <span class="small">Course</span><span class="small">Units</span><span class="small">Grade</span><span></span>
-      </div>
-      <div id="courses"></div>
-
-      <div class="actions">
-        <button class="btn" id="addCourse">+ Course</button>
-        <button class="btn alt" id="resetGpa">Reset</button>
-      </div>
-
-      <hr>
-      <p class="hint"><b>For CGPA</b>, add your record from earlier semesters (optional):</p>
-      <div class="row">
-        <div class="field">
-          <label class="small" for="prevCgpa">Previous CGPA</label>
-          <input id="prevCgpa" type="number" inputmode="decimal" step="0.01" min="0" placeholder="4.12">
-        </div>
-        <div class="field">
-          <label class="small" for="prevUnits">Previous units</label>
-          <input id="prevUnits" type="number" inputmode="numeric" step="1" min="0" placeholder="60">
-        </div>
-      </div>
-
-      <div class="results">
-        <div class="card"><div class="small">Semester GPA</div><div class="val" id="gpaVal">0.00</div></div>
-        <div class="card b"><div class="small">CGPA</div><div class="val" id="cgpaVal">0.00</div></div>
-        <div class="card wide">
-          <div class="small" id="unitsLbl">Total units</div>
-          <div class="cls" id="clsVal">—</div>
-          <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
-          <div class="barlbl"><span>0</span><span id="barMax">5.0</span></div>
-          <div class="vibe" id="vibe">Add your courses to see your damage.</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn brown" id="copyBtn">Copy result</button>
-      </div>
-
-      <hr>
-      <div class="head">Target planner</div>
-      <p class="hint">What do you need next semester to land your dream CGPA?</p>
-      <div class="row">
-        <div class="field">
-          <label class="small" for="target">Target CGPA</label>
-          <input id="target" type="number" inputmode="decimal" step="0.01" min="0" placeholder="4.50">
-        </div>
-        <div class="field">
-          <label class="small" for="remUnits">Units to go</label>
-          <input id="remUnits" type="number" inputmode="numeric" step="1" min="1" placeholder="24">
-        </div>
-      </div>
-      <div class="planner-out" id="plannerOut">Fill both boxes. Do the math, skip the panic.</div>
-    </div>
-  </section>
+  <div class="toast" id="toast"></div>
 </div>
-<div class="toast" id="toast"></div>
 
-<script>
-/* ============ Tabs ============ */
-const tabCalc = document.getElementById('tabCalc'), tabGpa = document.getElementById('tabGpa');
-const panelCalc = document.getElementById('panelCalc'), panelGpa = document.getElementById('panelGpa');
-function showTab(which) {
-  const g = which === 'gpa';
-  tabCalc.classList.toggle('active', !g); tabGpa.classList.toggle('active', g);
-  tabCalc.setAttribute('aria-selected', !g); tabGpa.setAttribute('aria-selected', g);
-  panelCalc.classList.toggle('active', !g); panelGpa.classList.toggle('active', g);
-}
-tabCalc.onclick = () => showTab('calc');
-tabGpa.onclick = () => showTab('gpa');
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  clearTimeout(toast.id); toast.id = setTimeout(() => t.style.display = 'none', 1600);
-}
-
-/* ============ Calculator ============ */
-const exprEl = document.getElementById('expr');
-const previewEl = document.getElementById('preview');
-const historyEl = document.getElementById('history');
-let expr = '', lastAnswer = '', justEvaluated = false;
-const history = [];
-
-/* Safe parser (no eval). + − × ÷ ( ) % and unary minus.
-   "200+10%" = 220 (percent of left side), "50%" = 0.5 */
-function evaluate(src) {
-  const s = src.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
-  let i = 0;
-  const peek = () => s[i];
-  function number() {
-    const m = /^\d*\.?\d+|^\d+\.?/.exec(s.slice(i));
-    if (!m) throw new Error('num');
-    i += m[0].length;
-    return parseFloat(m[0]);
-  }
-  function primary() {
-    let v, pct = false;
-    if (peek() === '(') {
-      i++; v = expression().v;
-      if (peek() !== ')') throw new Error('paren');
-      i++;
-    } else if (peek() === '-') { i++; const p = primary(); return { v: -p.v, pct: p.pct }; }
-    else if (peek() === '+') { i++; return primary(); }
-    else v = number();
-    while (peek() === '%') { i++; v = v / 100; pct = true; }
-    return { v, pct };
-  }
-  function term() {
-    let a = primary();
-    while (peek() === '*' || peek() === '/') {
-      const op = s[i++]; const b = primary();
-      if (op === '*') a = { v: a.v * b.v, pct: false };
-      else { if (b.v === 0) throw new Error('div0'); a = { v: a.v / b.v, pct: false }; }
-    }
-    return a;
-  }
-  function expression() {
-    let a = term();
-    while (peek() === '+' || peek() === '-') {
-      const op = s[i++]; const b = term();
-      const rhs = b.pct ? a.v * b.v : b.v;
-      a = { v: op === '+' ? a.v + rhs : a.v - rhs, pct: false };
-    }
-    return a;
-  }
-  const r = expression();
-  if (i !== s.length) throw new Error('syntax');
-  if (!isFinite(r.v)) throw new Error('inf');
-  return r.v;
-}
-const fmt = n => parseFloat(n.toPrecision(12)).toString().replace(/e\+?/, 'e');
-const autoClose = e => { const o = (e.match(/\(/g) || []).length - (e.match(/\)/g) || []).length; return o > 0 ? e + ')'.repeat(o) : e; };
-function render() {
-  exprEl.textContent = expr || '0';
-  exprEl.scrollLeft = exprEl.scrollWidth;
-  previewEl.textContent = '';
-  if (expr && !justEvaluated && /[−+×÷%(]/.test(expr.slice(1))) {
-    try { previewEl.textContent = '= ' + fmt(evaluate(autoClose(expr))); } catch (e) {}
-  }
-}
-function pushHistory(h) {
-  history.push(h); if (history.length > 30) history.shift();
-  historyEl.innerHTML = '';
-  history.forEach(x => {
-    const d = document.createElement('div');
-    d.textContent = x.text;
-    d.onclick = () => { expr = x.result; justEvaluated = false; render(); };
-    historyEl.appendChild(d);
-  });
-  historyEl.scrollTop = historyEl.scrollHeight;
-}
-const isOp = c => '+−×÷'.includes(c);
-function input(v) {
-  if (justEvaluated) { expr = (isOp(v) || v === '%') ? lastAnswer : ''; justEvaluated = false; }
-  const last = expr.slice(-1);
-  if (isOp(v)) {
-    if (!expr) { if (v === '−') expr = '−'; render(); return; }
-    if (last === '(' && v !== '−') return;
-    if (isOp(last)) expr = expr.slice(0, -1);
-  }
-  if (v === '.') {
-    const cur = expr.split(/[−+×÷()%]/).pop();
-    if (cur.includes('.')) return;
-    if (cur === '') v = '0.';
-  }
-  if (v === '%' && (!expr || isOp(last) || last === '(')) return;
-  if (v === ')') {
-    const open = (expr.match(/\(/g) || []).length - (expr.match(/\)/g) || []).length;
-    if (open <= 0 || isOp(last) || last === '(') return;
-  }
-  if (/\d/.test(v) && (last === ')' || last === '%')) expr += '×';
-  if (v === '(' && (/\d/.test(last) || last === ')' || last === '%')) expr += '×';
-  expr += v; render();
-}
-function equals() {
-  if (!expr) return;
-  const full = autoClose(expr);
-  try {
-    const res = fmt(evaluate(full));
-    pushHistory({ text: `${full} = ${res}`, result: res });
-    lastAnswer = res; expr = res; justEvaluated = true;
-    previewEl.textContent = ''; exprEl.textContent = res;
-  } catch (e) { previewEl.textContent = 'Error'; exprEl.textContent = expr; }
-}
-function action(a) {
-  if (a === 'clear') { expr = ''; justEvaluated = false; render(); }
-  else if (a === 'back') { if (justEvaluated) { expr = ''; justEvaluated = false; } else expr = expr.slice(0, -1); render(); }
-  else if (a === 'equals') equals();
-  else if (a === 'ans') { if (lastAnswer) { if (justEvaluated) expr = ''; justEvaluated = false; expr += lastAnswer; render(); } }
-  else if (a === 'gpa') showTab('gpa');
-}
-document.querySelector('.calc').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.act) action(b.dataset.act); else if (b.dataset.v) input(b.dataset.v);
-});
-document.addEventListener('keydown', e => {
-  if (!panelCalc.classList.contains('active') || e.target.matches('input, select')) return;
-  const k = e.key;
-  if (/^[0-9.()%]$/.test(k)) input(k);
-  else if (k === '+') input('+');
-  else if (k === '-') input('−');
-  else if (k === '*' || k === 'x') input('×');
-  else if (k === '/') { e.preventDefault(); input('÷'); }
-  else if (k === 'Enter' || k === '=') { e.preventDefault(); equals(); }
-  else if (k === 'Backspace') action('back');
-  else if (k === 'Escape' || k === 'Delete') action('clear');
-});
-render();
-
-/* ============ GPA / CGPA ============ */
-const SCALES = { 5: { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 }, 4: { A: 4, B: 3, C: 2, D: 1, F: 0 } };
-const coursesEl = document.getElementById('courses');
-const scaleEl = document.getElementById('scale');
-const prevCgpaEl = document.getElementById('prevCgpa');
-const prevUnitsEl = document.getElementById('prevUnits');
-const targetEl = document.getElementById('target');
-const remEl = document.getElementById('remUnits');
-const KEY = 'calc-gpa-v2';
-let lastSummary = '';
-
-const gradeOptions = (scale, sel) => Object.keys(SCALES[scale]).map(g => `<option value="${g}"${g === sel ? ' selected' : ''}>${g} (${SCALES[scale][g]})</option>`).join('');
-function addCourse(data = {}) {
-  const row = document.createElement('div');
-  row.className = 'course';
-  row.innerHTML = `
-    <input class="c-name" type="text" placeholder="MTH101" aria-label="Course name">
-    <input class="c-units" type="number" inputmode="numeric" min="0" step="1" placeholder="3" aria-label="Credit units">
-    <select class="c-grade" aria-label="Grade">${gradeOptions(scaleEl.value, data.grade || 'A')}</select>
-    <button class="del" aria-label="Remove course">×</button>`;
-  row.querySelector('.c-name').value = data.name || '';
-  row.querySelector('.c-units').value = data.units ?? '';
-  row.querySelector('.del').onclick = () => { row.remove(); computeGpa(); };
-  row.addEventListener('input', computeGpa);
-  coursesEl.appendChild(row);
-}
-function classOf(c, scale) {
-  if (scale === '5') {
-    if (c >= 4.5) return 'First Class';
-    if (c >= 3.5) return 'Second Class Upper (2:1)';
-    if (c >= 2.4) return 'Second Class Lower (2:2)';
-    if (c >= 1.5) return 'Third Class';
-    if (c >= 1.0) return 'Pass';
-    return 'Fail';
-  }
-  if (c >= 3.7) return 'First Class / Summa';
-  if (c >= 3.3) return 'Upper Second / Magna';
-  if (c >= 2.7) return 'Lower Second / Cum Laude';
-  if (c >= 2.0) return 'Pass';
-  return 'Below pass';
-}
-function vibeOf(ratio) {
-  if (ratio >= 0.9) return 'First class energy. Go touch grass.';
-  if (ratio >= 0.7) return '2:1 territory. Solid. Keep the pace.';
-  if (ratio >= 0.48) return '2:2 zone. Room for a comeback.';
-  if (ratio >= 0.3) return 'Lock in. Next semester is your arc.';
-  return 'Red alert. See your course adviser, no shame.';
-}
-function computeGpa() {
-  const scale = scaleEl.value, max = +scale;
-  let units = 0, points = 0;
-  [...coursesEl.children].forEach(r => {
-    const u = parseFloat(r.querySelector('.c-units').value);
-    const g = r.querySelector('.c-grade').value;
-    if (u > 0 && g in SCALES[scale]) { units += u; points += u * SCALES[scale][g]; }
-  });
-  const gpa = units ? points / units : 0;
-  const pu = parseFloat(prevUnitsEl.value) || 0, pc = parseFloat(prevCgpaEl.value) || 0;
-  const total = units + pu;
-  const cgpa = total ? (points + pc * pu) / total : 0;
-  document.getElementById('gpaVal').textContent = gpa.toFixed(2);
-  document.getElementById('cgpaVal').textContent = cgpa.toFixed(2);
-  document.getElementById('unitsLbl').textContent = `Total units: ${total}`;
-  document.getElementById('clsVal').textContent = total ? classOf(cgpa, scale) : '—';
-  document.getElementById('vibe').textContent = total ? vibeOf(cgpa / max) : 'Add your courses to see your damage.';
-  document.getElementById('barMax').textContent = max.toFixed(1);
-  document.getElementById('fill').style.width = Math.min(100, cgpa / max * 100) + '%';
-  drawTicks(scale);
-  lastSummary = total ? `GPA ${gpa.toFixed(2)} | CGPA ${cgpa.toFixed(2)} (${scale}.0 scale) | ${total} units | ${classOf(cgpa, scale)}` : '';
-  plan(cgpa, total, max);
-  save();
-}
-function drawTicks(scale) {
-  const bar = document.getElementById('bar');
-  bar.querySelectorAll('.tick').forEach(t => t.remove());
-  const marks = scale === '5' ? [1.5, 2.4, 3.5, 4.5] : [2.0, 2.7, 3.3, 3.7];
-  marks.forEach(m => { const t = document.createElement('div'); t.className = 'tick'; t.style.left = (m / +scale * 100) + '%'; bar.appendChild(t); });
-}
-function plan(cgpa, total, max) {
-  const out = document.getElementById('plannerOut');
-  const target = parseFloat(targetEl.value), rem = parseFloat(remEl.value);
-  out.className = 'planner-out';
-  if (!(target > 0) || !(rem > 0)) { out.textContent = 'Fill both boxes. Do the math, skip the panic.'; return; }
-  if (target > max) { out.textContent = `Target is above the ${max.toFixed(1)} max. Pick a real one.`; out.classList.add('bad'); return; }
-  const need = (target * (total + rem) - cgpa * total) / rem;
-  if (need > max + 1e-9) {
-    out.textContent = `You'd need ${need.toFixed(2)}, which is above the ${max.toFixed(1)} max. Not reachable in ${rem} units. Aim lower or add more units.`;
-    out.classList.add('bad');
-  } else if (need <= 0) {
-    out.textContent = `Already safe. You can hold ${target.toFixed(2)} even with a 0.00 next semester. Don't test it.`;
-    out.classList.add('ok');
-  } else {
-    out.textContent = `You need an average GPA of ${need.toFixed(2)} across the next ${rem} units to finish on ${target.toFixed(2)}.`;
-    out.classList.add('ok');
-  }
-}
-function save() {
-  try {
-    localStorage.setItem(KEY, JSON.stringify({
-      scale: scaleEl.value, prevCgpa: prevCgpaEl.value, prevUnits: prevUnitsEl.value,
-      target: targetEl.value, rem: remEl.value,
-      courses: [...coursesEl.children].map(r => ({
-        name: r.querySelector('.c-name').value, units: r.querySelector('.c-units').value, grade: r.querySelector('.c-grade').value
-      }))
-    }));
-  } catch (e) {}
-}
-function load() {
-  let d = null;
-  try { d = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
-  if (d) {
-    scaleEl.value = d.scale || '5';
-    prevCgpaEl.value = d.prevCgpa || ''; prevUnitsEl.value = d.prevUnits || '';
-    targetEl.value = d.target || ''; remEl.value = d.rem || '';
-    (d.courses || []).forEach(addCourse);
-  }
-  if (!coursesEl.children.length) for (let i = 0; i < 4; i++) addCourse();
-  computeGpa();
-}
-scaleEl.addEventListener('change', () => {
-  const rows = [...coursesEl.children].map(r => ({
-    name: r.querySelector('.c-name').value, units: r.querySelector('.c-units').value, grade: r.querySelector('.c-grade').value
-  }));
-  coursesEl.innerHTML = '';
-  rows.forEach(r => addCourse({ ...r, grade: r.grade in SCALES[scaleEl.value] ? r.grade : 'A' }));
-  computeGpa();
-});
-document.getElementById('addCourse').onclick = () => addCourse();
-document.getElementById('resetGpa').onclick = () => {
-  coursesEl.innerHTML = ''; [prevCgpaEl, prevUnitsEl, targetEl, remEl].forEach(e => e.value = '');
-  for (let i = 0; i < 4; i++) addCourse();
-  computeGpa();
-};
-document.getElementById('copyBtn').onclick = async () => {
-  if (!lastSummary) { toast('Nothing to copy yet'); return; }
-  try { await navigator.clipboard.writeText(lastSummary); toast('Copied!'); }
-  catch (e) { toast(lastSummary); }
-};
-[prevCgpaEl, prevUnitsEl, targetEl, remEl].forEach(e => e.addEventListener('input', computeGpa));
-load();
-</script>
+<script src="script.js"></script>
 </body>
 </html>
