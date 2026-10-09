@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="UAES Calculator: a mobile-friendly calculator with GPA and CGPA tools for students.">
+<meta name="theme-color" content="#f6a93a">
+<title>UAES Calculator</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Baloo+2:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Everything lives inside .uaes-app so it can be merged into another page. -->
+<div class="uaes-app is-page">
+  <div class="wrap">
+
+    <header class="brand">
+      <div class="logo-badge">
+        <img src="assets/logo.png" alt="UAES logo" id="logoImg">
+        <!-- Generic fallback emblem (shown only if assets/logo.png is missing) -->
+        <svg id="logoFallback" viewBox="0 0 100 100" role="img" aria-label="UAES" hidden>
+          <circle cx="50" cy="50" r="46" fill="#1f8a3b" stroke="#1d1b2e" stroke-width="4"/>
+          <path d="M18 42 L50 27 L82 42 L50 57 Z" fill="#fff" stroke="#1d1b2e" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M33 50 V65 Q50 76 67 65 V50" fill="#ffe9a8" stroke="#1d1b2e" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M82 42 V62" stroke="#1d1b2e" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>UAES CALCULATOR</h1>
+        <p>Calculator + GPA / CGPA</p>
+      </div>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" id="tabCalc" role="tab" aria-selected="true">Calculator</button>
+      <button class="tab" id="tabGpa" role="tab" aria-selected="false">GPA / CGPA</button>
+    </div>
+
+    <!-- CALCULATOR -->
+    <section class="panel active" id="panelCalc">
+      <div class="shell calc">
+        <div class="screen">
+          <div class="history" id="history" aria-label="History"></div>
+          <div class="preview" id="preview"></div>
+          <div class="expr" id="expr" aria-live="polite">0</div>
+        </div>
+
+        <div class="top">
+          <div class="rounds">
+            <button class="round" data-act="clear" aria-label="Clear">CE</button>
+            <button class="round" data-act="back" aria-label="Backspace">⌫</button>
+            <button class="round" data-act="ans" aria-label="Last answer">Ans</button>
+          </div>
+          <div class="squares">
+            <button class="sq" data-v="(" aria-label="Open bracket">(</button>
+            <button class="sq" data-v=")" aria-label="Close bracket">)</button>
+            <button class="sq" data-v="%" aria-label="Percent">%</button>
+            <button class="sq gap" data-act="gpa" aria-label="Go to GPA calculator">GPA</button>
+          </div>
+        </div>
+
+        <div class="keys">
+          <button class="key" data-v="7">7</button>
+          <button class="key" data-v="8">8</button>
+          <button class="key" data-v="9">9</button>
+          <button class="key" data-v="÷">÷</button>
+
+          <button class="key" data-v="4">4</button>
+          <button class="key" data-v="5">5</button>
+          <button class="key" data-v="6">6</button>
+          <button class="key" data-v="×">×</button>
+
+          <button class="key" data-v="1">1</button>
+          <button class="key" data-v="2">2</button>
+          <button class="key" data-v="3">3</button>
+          <button class="key" data-v="−">−</button>
+
+          <button class="key" data-v="0">0</button>
+          <button class="key" data-v=".">.</button>
+          <button class="key" data-act="equals">=</button>
+          <button class="key" data-v="+">+</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- GPA -->
+    <section class="panel" id="panelGpa">
+      <div class="shell gpa">
+        <div class="head">Grade check</div>
+
+        <div class="row">
+          <div class="field">
+            <label class="small" for="scale">Grading scale</label>
+            <select id="scale">
+              <option value="5">5.0 scale (A=5)</option>
+              <option value="4">4.0 scale (A=4)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="course" style="margin-bottom:2px">
+          <span class="small">Course</span><span class="small">Units</span><span class="small">Grade</span><span></span>
+        </div>
+        <div id="courses"></div>
+
+        <div class="actions">
+          <button class="btn" id="addCourse">+ Course</button>
+          <button class="btn alt" id="resetGpa">Reset</button>
+        </div>
+
+        <hr>
+        <p class="hint"><b>For CGPA</b>, add your record from earlier semesters (optional):</p>
+        <div class="row">
+          <div class="field">
+            <label class="small" for="prevCgpa">Previous CGPA</label>
+            <input id="prevCgpa" type="number" inputmode="decimal" step="0.01" min="0" placeholder="4.12">
+          </div>
+          <div class="field">
+            <label class="small" for="prevUnits">Previous units</label>
+            <input id="prevUnits" type="number" inputmode="numeric" step="1" min="0" placeholder="60">
+          </div>
+        </div>
+
+        <div class="results">
+          <div class="card"><div class="small">Semester GPA</div><div class="val" id="gpaVal">0.00</div></div>
+          <div class="card b"><div class="small">CGPA</div><div class="val" id="cgpaVal">0.00</div></div>
+          <div class="card wide">
+            <div class="small" id="unitsLbl">Total units</div>
+            <div class="cls" id="clsVal">—</div>
+            <div class="bar" id="bar"><div class="fill" id="fill"></div></div>
+            <div class="barlbl"><span>0</span><span id="barMax">5.0</span></div>
+            <div class="vibe" id="vibe">Add your courses to see your damage.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn brown" id="copyBtn">Copy result</button>
+        </div>
+
+        <hr>
+        <div class="head">Target planner</div>
+        <p class="hint">What do you need next semester to land your dream CGPA?</p>
+        <div class="row">
+          <div class="field">
+            <label class="small" for="target">Target CGPA</label>
+            <input id="target" type="number" inputmode="decimal" step="0.01" min="0" placeholder="4.50">
+          </div>
+          <div class="field">
+            <label class="small" for="remUnits">Units to go</label>
+            <input id="remUnits" type="number" inputmode="numeric" step="1" min="1" placeholder="24">
+          </div>
+        </div>
+        <div class="planner-out" id="plannerOut">Fill both boxes. Do the math, skip the panic.</div>
+      </div>
+    </section>
+
+    <p class="foot">Unofficial student tool. Always confirm your results with your department.</p>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

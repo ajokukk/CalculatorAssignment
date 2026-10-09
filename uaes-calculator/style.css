@@ -1,0 +1,176 @@
+/* ==========================================================================
+   UAES CALCULATOR — styles
+   Every rule is scoped under .uaes-app so it can be merged into an existing
+   site without restyling the rest of the page. The only global rule is the
+   body margin reset at the very top (safe to delete when merging).
+   ========================================================================== */
+
+body { margin: 0; }
+
+.uaes-app {
+  --ink: #1d1b2e;
+  --body: #f6a93a;        /* orange shell */
+  --body-dark: #e18f1f;
+  --edge: #6b7fd1;        /* blue-purple thickness */
+  --edge-dark: #4c5fb0;
+  --screen: #93d2ea;      /* light blue screen */
+  --key: #8fd0ea;
+  --key-edge: #5873c4;
+  --brown: #b5533c;
+  --brown-edge: #7d3424;
+  --red: #ef4a2f;
+  --red-edge: #a8281a;
+  --green: #1f8a3b;       /* UAES green */
+  --maroon: #6b1f3a;      /* UAES maroon ribbon */
+  --maroon-edge: #3e1022;
+  --bw: 4px;
+
+  font-family: "Patrick Hand", "Baloo 2", system-ui, sans-serif;
+  color: var(--ink);
+  background: #fff4d6;
+  background-image: radial-gradient(#f3dca0 2px, transparent 2px);
+  background-size: 22px 22px;
+  padding: 18px 16px 34px;
+  display: flex;
+  justify-content: center;
+}
+.uaes-app.is-page { min-height: 100vh; }
+.uaes-app *, .uaes-app *::before, .uaes-app *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+.uaes-app .wrap { width: 100%; max-width: 440px; }
+
+/* ---------- brand header ---------- */
+.uaes-app .brand { display: flex; align-items: center; gap: 14px; margin: 4px 4px 20px; }
+.uaes-app .logo-badge {
+  flex: none; width: clamp(66px, 19vw, 86px); aspect-ratio: 1; border-radius: 50%;
+  background: #fff; border: var(--bw) solid var(--ink); padding: 3px;
+  box-shadow: 0 6px 0 var(--edge), 0 6px 0 3px var(--ink);
+  transform: rotate(-5deg); display: grid; place-items: center; overflow: hidden;
+}
+.uaes-app .logo-badge img, .uaes-app .logo-badge svg { width: 100%; height: 100%; object-fit: contain; display: block; }
+.uaes-app .logo-badge [hidden] { display: none; }
+.uaes-app .brand-text { min-width: 0; }
+.uaes-app .brand h1 {
+  margin: 0; display: inline-block; background: var(--maroon); color: #ffe9a8;
+  border: var(--bw) solid var(--ink); border-radius: 12px; padding: 4px 12px 2px;
+  font: 800 clamp(20px, 6.2vw, 28px)/1.15 "Baloo 2", sans-serif; letter-spacing: .02em;
+  box-shadow: 0 5px 0 var(--maroon-edge);
+}
+.uaes-app .brand p { margin: 10px 2px 0; font-size: 17px; }
+
+/* ---------- tabs ---------- */
+.uaes-app .tabs { display: flex; gap: 10px; margin-bottom: 18px; }
+.uaes-app .tab {
+  flex: 1; padding: 11px 8px; border: var(--bw) solid var(--ink); border-radius: 16px; cursor: pointer;
+  background: var(--key); color: var(--ink); font: 800 17px "Baloo 2", sans-serif;
+  box-shadow: 0 5px 0 var(--key-edge); transition: transform .06s, box-shadow .06s;
+}
+.uaes-app .tab.active { background: var(--body); box-shadow: 0 5px 0 var(--body-dark); }
+.uaes-app .tab:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--key-edge); }
+
+.uaes-app .panel { display: none; }
+.uaes-app .panel.active { display: block; }
+
+/* ---------- calculator shell: orange face + blue thickness ---------- */
+.uaes-app .shell {
+  background: var(--body); border: var(--bw) solid var(--ink); border-radius: 26px;
+  padding: 18px 16px 22px;
+  box-shadow: 10px 10px 0 -1px var(--edge), 10px 10px 0 2px var(--ink);
+  margin-right: 10px; margin-bottom: 10px;
+}
+
+.uaes-app .screen {
+  background: var(--screen); border: var(--bw) solid var(--ink); border-radius: 16px;
+  padding: 8px 14px 10px; text-align: right; box-shadow: inset 0 4px 0 rgba(255,255,255,.35);
+}
+.uaes-app .history { height: 58px; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; justify-content: flex-end; }
+.uaes-app .history::-webkit-scrollbar { display: none; }
+.uaes-app .history div { font-size: 16px; padding: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; opacity: .65; }
+.uaes-app .history div:hover { opacity: 1; }
+.uaes-app .preview { font-size: 20px; min-height: 24px; opacity: .7; }
+.uaes-app .expr { font: 800 clamp(34px, 11vw, 50px) "Baloo 2", sans-serif; line-height: 1.1; min-height: 1.1em; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+.uaes-app .expr::-webkit-scrollbar { display: none; }
+
+/* little round brown buttons + red squares, like the drawing */
+.uaes-app .top { display: flex; justify-content: space-between; align-items: center; margin: 18px 4px 6px; gap: 10px; }
+.uaes-app .rounds { display: flex; gap: 12px; }
+.uaes-app .round {
+  width: clamp(40px, 11vw, 48px); height: clamp(40px, 11vw, 48px); border-radius: 50%;
+  border: 3px solid var(--ink); background: var(--brown); color: #fff; cursor: pointer;
+  font: 800 15px "Baloo 2", sans-serif; box-shadow: 0 5px 0 var(--brown-edge);
+  transition: transform .06s, box-shadow .06s; padding: 0;
+}
+.uaes-app .round:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--brown-edge); }
+.uaes-app .squares { display: flex; gap: 6px; }
+.uaes-app .sq {
+  width: clamp(32px, 9vw, 40px); height: clamp(30px, 8vw, 36px); border: 3px solid var(--ink);
+  background: var(--red); color: #fff; cursor: pointer; font: 800 clamp(15px, 4vw, 19px) "Baloo 2", sans-serif;
+  border-radius: 5px; box-shadow: 0 4px 0 var(--red-edge); padding: 0; transition: transform .06s, box-shadow .06s;
+}
+.uaes-app .sq:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--red-edge); }
+.uaes-app .sq.gap { margin-left: 6px; font-size: 12px; }
+
+.uaes-app .keys { margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: clamp(56px, 16vw, 70px); gap: 12px 10px; }
+.uaes-app .key {
+  background: var(--key); border: 3px solid var(--ink); border-radius: 14px; cursor: pointer; color: var(--ink);
+  font: 800 clamp(22px, 7vw, 30px) "Baloo 2", sans-serif; padding: 0;
+  box-shadow: 0 7px 0 var(--key-edge), 0 7px 0 3px var(--ink); margin-bottom: 7px;
+  transition: transform .06s, box-shadow .06s;
+}
+.uaes-app .key:active { transform: translateY(6px); box-shadow: 0 1px 0 var(--key-edge), 0 1px 0 3px var(--ink); }
+
+/* ---------- GPA ---------- */
+.uaes-app .gpa .head { display: inline-block; background: var(--screen); border: 3px solid var(--ink); border-radius: 12px; padding: 2px 12px; font: 800 19px "Baloo 2", sans-serif; margin: 0 0 12px; }
+.uaes-app .small { font: 700 13px "Patrick Hand", sans-serif; text-transform: uppercase; letter-spacing: .04em; }
+.uaes-app .field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
+.uaes-app .row { display: flex; gap: 10px; margin-bottom: 10px; }
+.uaes-app input, .uaes-app select {
+  width: 100%; height: 46px; border: 3px solid var(--ink); border-radius: 12px; background: #fff;
+  color: var(--ink); padding: 0 10px; font: 700 17px "Patrick Hand", sans-serif; /* >=16px stops iOS zoom */
+}
+.uaes-app input:focus, .uaes-app select:focus { outline: 0; background: var(--screen); box-shadow: 0 4px 0 var(--key-edge); }
+.uaes-app .course { display: grid; grid-template-columns: 1.5fr .8fr .95fr 46px; gap: 8px; margin-bottom: 8px; }
+.uaes-app .del { height: 46px; border: 3px solid var(--ink); border-radius: 12px; background: var(--red); color: #fff; font: 800 22px "Baloo 2", sans-serif; cursor: pointer; box-shadow: 0 4px 0 var(--red-edge); padding: 0; }
+.uaes-app .del:active { transform: translateY(3px); box-shadow: none; }
+.uaes-app .btn { border: 3px solid var(--ink); border-radius: 14px; padding: 10px 16px; font: 800 16px "Baloo 2", sans-serif; cursor: pointer; background: var(--key); color: var(--ink); box-shadow: 0 5px 0 var(--key-edge); }
+.uaes-app .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--key-edge); }
+.uaes-app .btn.alt { background: #fff; }
+.uaes-app .btn.brown { background: var(--brown); color: #fff; box-shadow: 0 5px 0 var(--brown-edge); }
+.uaes-app .actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 12px 0 8px; }
+.uaes-app hr { border: 0; border-top: 3px dashed var(--ink); margin: 18px 0; }
+.uaes-app .hint { font-size: 16px; margin: 0 0 8px; }
+
+.uaes-app .results { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.uaes-app .card { border: 3px solid var(--ink); border-radius: 16px; padding: 10px 12px; background: var(--screen); box-shadow: 0 5px 0 var(--key-edge); }
+.uaes-app .card.b { background: #fff; box-shadow: 0 5px 0 var(--body-dark); }
+.uaes-app .card .val { font: 800 clamp(32px, 10vw, 42px) "Baloo 2", sans-serif; line-height: 1.1; }
+.uaes-app .card.wide { grid-column: 1 / -1; background: #fff; box-shadow: 0 5px 0 var(--edge); }
+.uaes-app .cls { font: 800 19px "Baloo 2", sans-serif; }
+.uaes-app .vibe { margin-top: 8px; font-size: 17px; background: var(--ink); color: #ffe9a8; padding: 8px 10px; border-radius: 10px; }
+
+.uaes-app .bar { position: relative; height: 24px; border: 3px solid var(--ink); border-radius: 12px; background: #fff; margin: 8px 0 3px; overflow: visible; }
+.uaes-app .bar .fill { height: 100%; border-radius: 8px; background: var(--green); width: 0; transition: width .4s ease; }
+.uaes-app .bar .tick { position: absolute; top: -5px; bottom: -5px; width: 3px; background: var(--ink); }
+.uaes-app .barlbl { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; }
+
+.uaes-app .planner-out { margin-top: 10px; border: 3px dashed var(--ink); border-radius: 14px; padding: 10px 12px; font-size: 18px; min-height: 52px; background: #fff7e0; }
+.uaes-app .planner-out.ok { background: #c9f2a7; border-style: solid; }
+.uaes-app .planner-out.bad { background: #ffb4a8; border-style: solid; }
+
+.uaes-app .foot { margin: 22px 4px 0; font-size: 14px; text-align: center; opacity: .75; }
+
+/* toast sits outside .wrap but inside .uaes-app */
+.uaes-app .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #ffe9a8; padding: 10px 18px; border-radius: 14px; font: 700 16px "Patrick Hand", sans-serif; display: none; z-index: 9; max-width: 90vw; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 380px) {
+  .uaes-app { padding: 10px 10px 28px; }
+  .uaes-app .shell { padding: 14px 12px 18px; border-radius: 22px; }
+  .uaes-app .course { grid-template-columns: 1.3fr .8fr .9fr 42px; gap: 6px; }
+  .uaes-app .keys { gap: 10px 8px; }
+  .uaes-app .brand { gap: 10px; }
+}
+@media (min-width: 700px) { .uaes-app { padding-top: 40px; } }
+@media (prefers-reduced-motion: reduce) {
+  .uaes-app * { transition: none !important; }
+}
